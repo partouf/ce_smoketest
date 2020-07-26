@@ -1,15 +1,15 @@
 {
-  "name": "ce_smoketest",
+  "name": "@partouf/ce_smoketest",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cd node_modules/compilerexplorer-api && tsc && cd ../.. && tsc",
+    "build": "tsc",
     "start": "node dist/index.js"
   },
-  "author": "",
+  "author": "partouf",
   "license": "Apache-2.0",
   "dependencies": {
-    "compilerexplorer-api": "git+https://github.com/partouf/node-compilerexplorer-api.git"
+    "@partouf/compilerexplorer-api": "0.0.3"
   }
 }

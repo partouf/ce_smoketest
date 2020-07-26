@@ -1,4 +1,4 @@
-import { Api, IApi, ICompiler, ICompilationResult, IResultLine } from "compilerexplorer-api";
+import { Api, IApi, ICompiler, ICompilationResult, IResultLine } from "@partouf/compilerexplorer-api";
 
 class CppChainSmoker {
     private ce: IApi;
