@@ -1,4 +1,73 @@
-import { Api, IApi, ICompiler, ICompilationResult, IResultLine } from "@partouf/compilerexplorer-api";
+import { Api, APIType, IApi, ICompiler, ICompilationResult, IResultLine, ICompilerFilters } from "@partouf/compilerexplorer-api";
+
+
+class CppTestJson {
+    private ce: IApi;
+    private succeeded: Array<ICompilationResult> = [];
+    private failed: Array<ICompilationResult> = [];
+    private sourcecode: string;
+
+    constructor() {
+        this.ce = new Api({
+            url: "https://godbolt.org",
+            defaultLanguage: "c++",
+            apiType: APIType.JSON,
+        });
+
+        this.sourcecode =
+`
+    #include <iostream>
+    int main(void) {
+        std::cout << "hello world\\n";
+        return 123;
+    }
+`;
+    }
+
+    private async compilationTest() {
+        const compiler = await this.ce.compilers.find("gcc", "10.1");
+        const result = await compiler.compile(this.sourcecode, undefined, undefined, {
+            directives: true,
+            labels: true,
+            commentOnly: true,
+            libraryCode: true,
+        } as ICompilerFilters);
+
+        if (result.code === 0 && result.stdout.length === 0) {
+            console.log(`SUCCESS ${compiler.id} (${compiler.name})`);
+            this.succeeded.push(result);
+        } else {
+            console.error(`FAIL ${compiler.id} (${compiler.name})`);
+            console.error(result);
+            this.failed.push(result);
+        }
+
+        return true;
+    }
+
+    private async executionTest() {
+        const compiler = await this.ce.compilers.find("gcc", "10.1");
+        const result = await compiler.execute(this.sourcecode);
+
+        if (result.code === 123 && result.stdout[0] && result.stdout[0].text === "hello world") {
+            console.log(`SUCCESS ${compiler.id} (${compiler.name})`);
+            this.succeeded.push(result);
+        } else {
+            console.error(`FAIL ${compiler.id} (${compiler.name}) - ${result.code}`);
+            console.error(result);
+            this.failed.push(result);
+        }
+
+        return true;
+    }
+
+    async doAllTests() {
+        if (!await this.executionTest()) throw 'failed executionTest';
+        if (!await this.compilationTest()) throw 'failed compilationTest';
+
+        return true;
+    }
+};
 
 class CppChainSmoker {
     private ce: IApi;
@@ -204,7 +273,7 @@ func main() {
     }
 };
 
-const smoker = new GoChainSmoker();
-smoker.compile().then((result) => {
+const smoker = new CppTestJson();
+smoker.doAllTests().then((result) => {
     console.log(result);
 });

@@ -10,6 +10,6 @@
   "author": "partouf",
   "license": "Apache-2.0",
   "dependencies": {
-    "@partouf/compilerexplorer-api": "0.0.3"
+    "@partouf/compilerexplorer-api": "0.0.4"
   }
 }
